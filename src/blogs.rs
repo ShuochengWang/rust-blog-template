@@ -26,6 +26,8 @@ pub(crate) struct Manifest {
     /// What text to use when linking to this blog in the "see also"
     /// section from other blogs.
     pub(crate) link_text: String,
+
+    pub(crate) domain: String,
 }
 
 #[derive(Serialize)]
@@ -34,6 +36,7 @@ pub(crate) struct Blog {
     index_title: String,
     link_text: String,
     description: String,
+    domain: String,
     maintained_by: String,
     index_html: String,
     #[serde(serialize_with = "add_postfix_slash")]
@@ -83,6 +86,7 @@ impl Blog {
             title: manifest.title,
             index_title: manifest.index_title,
             description: manifest.description,
+            domain: manifest.domain,
             maintained_by: manifest.maintained_by,
             index_html: manifest.index_html,
             link_text: manifest.link_text,

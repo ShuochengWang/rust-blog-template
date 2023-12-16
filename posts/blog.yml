@@ -1,9 +1,11 @@
-title: Rust Blog
-index-title: The Rust Programming Language Blog
-link-text: the main Rust blog
-description: Empowering everyone to build reliable and efficient software.
-index-html: This is the <b>main Rust blog</b>.
-            <a href="https://www.rust-lang.org/governance/">Rust teams</a>
-            use this blog to announce major developments in the world of Rust.
-maintained-by: the Rust Teams
-
+title: Shuocheng's Blog
+index-title: Shuocheng's Blog With Rust-Blog Style
+link-text: Shuocheng's Blog
+description: Just a blog to record something.
+index-html: This is the <b>Shuocheng Wang's Blog</b>.
+            And you can call me <b>Stuart</b>.
+            This blog is developed from 
+            <a href="https://blog.rust-lang.org/">Rust Blog</a>
+            because I'm a fan of Rust!
+maintained-by: Shuocheng Wang
+domain: https://shuochengwang.github.io
