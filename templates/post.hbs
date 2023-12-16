@@ -6,12 +6,26 @@
       <div class="highlight mt2 mb3"></div>
     </header>
 
-    <div class="publish-date-author">{{month_name post.month}} {{post.day}}, {{post.year}}
+    <div class="publish-date-tags">
+      {{month_name post.month}} {{post.day}}, {{post.year}}
+      &ensp;&ensp;
+      {{#each tags}}
+              <a href="{{../root}}{{url}}">#&thinsp;{{tag}}</a>
+              &ensp;
+      {{/each}}
     </div>
 
     <div class="post">
       {{{ post.contents }}}
     </div>
+
+    <div class="post-tags">
+      {{#each tags}}
+              <a href="{{../root}}{{url}}"># {{tag}}</a>
+              &ensp;
+      {{/each}}
+    </div>
+
   </div>
 </section>
 {{/inline}}

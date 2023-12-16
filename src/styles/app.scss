@@ -230,9 +230,20 @@ table.post-list a:hover {
   text-decoration: underline;
 }
 
-.publish-date-author {
+.publish-date-tags {
   color: $gray;
   margin: -60px 0 60px 0;
+  a {
+    text-decoration-color: $yellow;
+  }
+}
+
+.post-tags {
+  color: $gray;
+  margin: 0 0 -30px 0;
+  a {
+    text-decoration-color: $yellow;
+  }
 }
 
 footer {

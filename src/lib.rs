@@ -20,17 +20,6 @@ struct Generator<'a> {
     out_directory: PathBuf,
 }
 
-#[derive(Debug, Serialize)]
-struct Releases {
-    releases: Vec<ReleasePost>,
-    feed_updated: String,
-}
-
-#[derive(Debug, Serialize)]
-struct ReleasePost {
-    title: String,
-    url: String,
-}
 handlebars_helper!(hb_month_name_helper: |month_num: u64| match month_num {
     1 => "Jan.",
     2 => "Feb.",
@@ -174,11 +163,22 @@ impl<'a> Generator<'a> {
         let mut filename = PathBuf::from(&post.filename);
         filename.set_extension("html");
 
+        let tags = post
+            .tags
+            .iter()
+            .map(|tag| {
+                json!({
+                    "tag": tag,
+                    "url": format!("tags/{}", tag),
+                })
+            })
+            .collect::<Vec<_>>();
         let data = json!({
             "title": format!("{} | {}", post.title, blog.title()),
             "parent": "layout",
             "blog": blog,
             "post": post,
+            "tags": tags,
             "root": blog.path_back_to_root().join("../../../"),
         });
 
