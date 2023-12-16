@@ -1,7 +1,8 @@
 ---
 layout: post
-title: "Road to Rust 1.0"
-author: Niko Matsakis
+title: "Getting started"
+tags: 
+  - blog
 description: "Rust 1.0 is on its way! We have nailed down a concrete list of features and are hard at work on implementing them."
 ---
 

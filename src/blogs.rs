@@ -23,9 +23,6 @@ pub(crate) struct Manifest {
     /// Raw html describing the blog to insert into the index page.
     pub(crate) index_html: String,
 
-    /// If true, posts require a `team` in their metadata.
-    pub(crate) requires_team: bool,
-
     /// What text to use when linking to this blog in the "see also"
     /// section from other blogs.
     pub(crate) link_text: String,
@@ -127,11 +124,7 @@ pub(crate) fn load(base: &Path) -> eyre::Result<Vec<Blog>> {
     Ok(blogs)
 }
 
-fn load_recursive(
-    base: &Path,
-    current: &Path,
-    blogs: &mut Vec<Blog>,
-) -> eyre::Result<()> {
+fn load_recursive(base: &Path, current: &Path, blogs: &mut Vec<Blog>) -> eyre::Result<()> {
     for entry in std::fs::read_dir(current)? {
         let path = entry?.path();
         let file_type = path.metadata()?.file_type();

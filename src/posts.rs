@@ -1,17 +1,13 @@
 use super::blogs::Manifest;
 use comrak::{ComrakExtensionOptions, ComrakOptions, ComrakRenderOptions};
-use regex::Regex;
+use eyre::eyre;
 use serde_derive::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
-use eyre::eyre;
 
 #[derive(Debug, PartialEq, Deserialize)]
 struct YamlHeader {
     title: String,
-    author: String,
-    #[serde(default)]
-    release: bool,
-    team: Option<String>,
+    tags: Vec<String>,
     layout: String,
 }
 
@@ -20,7 +16,7 @@ pub(crate) struct Post {
     pub(crate) filename: String,
     pub(crate) layout: String,
     pub(crate) title: String,
-    pub(crate) author: String,
+    pub(crate) tags: Vec<String>,
     pub(crate) year: i32,
     pub(crate) show_year: bool,
     pub(crate) month: u32,
@@ -29,10 +25,6 @@ pub(crate) struct Post {
     pub(crate) url: String,
     pub(crate) published: String,
     pub(crate) updated: String,
-    pub(crate) release: bool,
-    pub(crate) has_team: bool,
-    pub(crate) team: String,
-    pub(crate) team_url: String,
 }
 
 impl Post {
@@ -51,9 +43,9 @@ impl Post {
 
         let contents = std::fs::read_to_string(path)?;
         if contents.len() < 5 {
-            return Err(
-                eyre!("{path:?} is empty, or too short to have valid front matter")
-            );
+            return Err(eyre!(
+                "{path:?} is empty, or too short to have valid front matter"
+            ));
         }
 
         // yaml headers.... we know the first four bytes of each file are "---\n"
@@ -61,10 +53,8 @@ impl Post {
         let end_of_yaml = contents[4..].find("---").unwrap() + 4;
         let yaml = &contents[..end_of_yaml];
         let YamlHeader {
-            author,
             title,
-            release,
-            team: team_string,
+            tags,
             layout,
         } = serde_yaml::from_str(yaml)?;
         // next, the contents. we add + to get rid of the final "---\n\n"
@@ -110,37 +100,10 @@ impl Post {
             ),
         };
 
-        // Enforce extra conditions
-        if manifest.requires_team && team_string.is_none() {
-            panic!("blog post at path `{}` lacks team metadata", path.display());
-        }
-
-        // If they supplied team, it should look like `team-text <team-url>`
-        let (team, team_url) = match team_string {
-            Some(s) => {
-                lazy_static::lazy_static! {
-                    static ref R: Regex = Regex::new(r"(?P<name>[^<]*) <(?P<url>[^>]+)>").unwrap();
-                }
-                let captures = match R.captures(&s) {
-                    Some(c) => c,
-                    None => panic!(
-                        "team from path `{}` should have format `$name <$url>`",
-                        path.display()
-                    ),
-                };
-                (
-                    Some(captures["name"].to_string()),
-                    Some(captures["url"].to_string()),
-                )
-            }
-
-            None => (None, None),
-        };
-
         Ok(Self {
             filename,
             title,
-            author,
+            tags,
             year,
             show_year: false,
             month,
@@ -149,11 +112,7 @@ impl Post {
             url,
             published,
             updated,
-            release,
             layout,
-            has_team: team.is_some(),
-            team: team.unwrap_or_default(),
-            team_url: team_url.unwrap_or_default(),
         })
     }
 

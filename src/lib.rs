@@ -5,6 +5,7 @@ use self::blogs::Blog;
 use self::posts::Post;
 use chrono::Timelike;
 use handlebars::{handlebars_helper, Handlebars};
+use rayon::prelude::*;
 use sass_rs::{compile_file, Options};
 use serde_derive::Serialize;
 use serde_json::json;
@@ -12,7 +13,6 @@ use std::convert::AsRef;
 use std::fs::{self, File};
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
-use rayon::prelude::*;
 
 struct Generator<'a> {
     handlebars: Handlebars<'a>,
@@ -124,9 +124,12 @@ impl<'a> Generator<'a> {
         println!("{}: {}", blog.title(), self.file_url(&path));
 
         self.render_feed(blog)?;
-        self.render_releases_feed(blog)?;
 
-        let paths = blog.posts().par_iter().map(|post| self.render_post(blog, post)).collect::<Result<Vec<_>, _>>()?;
+        let paths = blog
+            .posts()
+            .par_iter()
+            .map(|post| self.render_post(blog, post))
+            .collect::<Result<Vec<_>, _>>()?;
         if let Some(path) = paths.first() {
             println!("└─ Latest post: {}\n", self.file_url(path));
         }
@@ -193,31 +196,6 @@ impl<'a> Generator<'a> {
         });
 
         self.render_template(blog.prefix().join("feed.xml"), "feed", data)?;
-        Ok(())
-    }
-
-    fn render_releases_feed(&self, blog: &Blog) -> eyre::Result<()> {
-        let posts = blog.posts().iter().cloned().collect::<Vec<_>>();
-        let is_released: Vec<&Post> = posts.iter().filter(|post| post.release).collect();
-        let releases: Vec<ReleasePost> = is_released
-            .iter()
-            .map(|post| ReleasePost {
-                title: post.title.clone(),
-                url: blog
-                    .prefix()
-                    .join(post.url.clone())
-                    .to_string_lossy()
-                    .to_string(),
-            })
-            .collect();
-        let data = Releases {
-            releases,
-            feed_updated: chrono::Utc::now().with_nanosecond(0).unwrap().to_rfc3339(),
-        };
-        fs::write(
-            self.out_directory.join(blog.prefix()).join("releases.json"),
-            serde_json::to_string(&data)?,
-        )?;
         Ok(())
     }
 
