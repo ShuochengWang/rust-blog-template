@@ -9,6 +9,7 @@ use rayon::prelude::*;
 use sass_rs::{compile_file, Options};
 use serde_derive::Serialize;
 use serde_json::json;
+use std::collections::HashMap;
 use std::convert::AsRef;
 use std::fs::{self, File};
 use std::io::{self, Write};
@@ -114,6 +115,8 @@ impl<'a> Generator<'a> {
 
         self.render_feed(blog)?;
 
+        self.render_tags(blog)?;
+
         let paths = blog
             .posts()
             .par_iter()
@@ -196,6 +199,48 @@ impl<'a> Generator<'a> {
         });
 
         self.render_template(blog.prefix().join("feed.xml"), "feed", data)?;
+        Ok(())
+    }
+
+    fn render_tags(&self, blog: &Blog) -> eyre::Result<()> {
+        let mut tag2post = HashMap::new();
+        blog.posts().iter().for_each(|post| {
+            for tag in &post.tags {
+                tag2post.insert(tag, post);
+            }
+        });
+
+        let tags = tag2post
+            .keys()
+            .map(|&tag| (tag, format!("tags/{}", tag)))
+            .collect::<Vec<_>>();
+
+        let path = blog.prefix().join("tags");
+        fs::create_dir_all(self.out_directory.join(&path))?;
+
+        // render tags index
+        let tags_data = tags
+            .iter()
+            .map(|(tag, url)| {
+                json!({
+                    "tag": tag,
+                    "url": url,
+                })
+            })
+            .collect::<Vec<_>>();
+        let data = json!({
+            "title": format!("Tags | {}", blog.title()),
+            "parent": "layout",
+            "blog": blog,
+            "tags": tags_data,
+            "root": blog.path_back_to_root().join("../"),
+        });
+        let mut filename = path.join("index");
+        filename.set_extension("html");
+        self.render_template(&filename, "tags", data)?;
+
+        // render single page for each tag
+        
         Ok(())
     }
 
