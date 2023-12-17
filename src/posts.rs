@@ -28,7 +28,7 @@ pub(crate) struct Post {
 }
 
 impl Post {
-    pub(crate) fn open(path: &Path, manifest: &Manifest) -> eyre::Result<Self> {
+    pub(crate) fn open(path: &Path, _manifest: &Manifest) -> eyre::Result<Self> {
         // yeah this might blow up, but it won't
         let filename = path.file_name().unwrap().to_str().unwrap();
 

@@ -7,7 +7,6 @@ use chrono::Timelike;
 use handlebars::{handlebars_helper, Handlebars};
 use rayon::prelude::*;
 use sass_rs::{compile_file, Options};
-use serde_derive::Serialize;
 use serde_json::json;
 use std::collections::HashMap;
 use std::convert::AsRef;
@@ -172,7 +171,7 @@ impl<'a> Generator<'a> {
             .map(|tag| {
                 json!({
                     "tag": tag,
-                    "url": format!("tags/{}", tag),
+                    "url": format!("tags/{}.html", tag),
                 })
             })
             .collect::<Vec<_>>();
@@ -206,17 +205,14 @@ impl<'a> Generator<'a> {
         let mut tag2post = HashMap::new();
         blog.posts().iter().for_each(|post| {
             for tag in &post.tags {
-                tag2post.insert(tag, post);
+                tag2post.entry(tag).or_insert(vec![]).push(post);
             }
         });
 
         let tags = tag2post
             .keys()
-            .map(|&tag| (tag, format!("tags/{}", tag)))
+            .map(|&tag| (tag, format!("tags/{}.html", tag)))
             .collect::<Vec<_>>();
-
-        let path = blog.prefix().join("tags");
-        fs::create_dir_all(self.out_directory.join(&path))?;
 
         // render tags index
         let tags_data = tags
@@ -233,14 +229,30 @@ impl<'a> Generator<'a> {
             "parent": "layout",
             "blog": blog,
             "tags": tags_data,
-            "root": blog.path_back_to_root().join("../"),
+            "root": blog.path_back_to_root(),
         });
-        let mut filename = path.join("index");
+        let mut filename = blog.prefix().join("tags");
         filename.set_extension("html");
         self.render_template(&filename, "tags", data)?;
 
         // render single page for each tag
-        
+        let path = blog.prefix().join("tags");
+        fs::create_dir_all(self.out_directory.join(&path))?;
+        for (tag, posts) in tag2post {
+            let data = json!({
+                "title": format!("Tags: {} | {}", tag, blog.title()),
+                "parent": "layout",
+                "blog": blog,
+                "tag": tag,
+                "posts": posts,
+                "root": blog.path_back_to_root().join("../"),
+            });
+
+            let mut filename = path.join(tag);
+            filename.set_extension("html");
+            self.render_template(&filename, "tag", data)?;
+        }
+
         Ok(())
     }
 
