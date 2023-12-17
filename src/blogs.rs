@@ -1,4 +1,4 @@
-use super::posts::Post;
+use super::posts::{AboutMePost, Post};
 use serde_derive::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 
@@ -42,6 +42,7 @@ pub(crate) struct Blog {
     #[serde(serialize_with = "add_postfix_slash")]
     prefix: PathBuf,
     posts: Vec<Post>,
+    aboutme: Option<AboutMePost>,
 }
 
 impl Blog {
@@ -50,11 +51,16 @@ impl Blog {
         let manifest: Manifest = serde_yaml::from_str(&manifest_content)?;
 
         let mut posts = Vec::new();
+        let mut aboutme = None;
         for entry in std::fs::read_dir(dir)? {
             let path = entry?.path();
             let ext = path.extension().and_then(|e| e.to_str());
             if path.metadata()?.file_type().is_file() && ext == Some(POSTS_EXT) {
-                posts.push(Post::open(&path, &manifest)?);
+                if path.file_name().unwrap().to_str().unwrap() == "aboutme.md" {
+                    aboutme = Some(AboutMePost::open(&path)?);
+                } else {
+                    posts.push(Post::open(&path, &manifest)?);
+                }
             }
         }
 
@@ -92,6 +98,7 @@ impl Blog {
             link_text: manifest.link_text,
             prefix,
             posts,
+            aboutme,
         })
     }
 
@@ -117,6 +124,10 @@ impl Blog {
 
     pub(crate) fn posts(&self) -> &[Post] {
         &self.posts
+    }
+
+    pub(crate) fn aboutme(&self) -> &Option<AboutMePost> {
+        &self.aboutme
     }
 }
 

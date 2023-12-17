@@ -116,6 +116,8 @@ impl<'a> Generator<'a> {
 
         self.render_tags(blog)?;
 
+        self.render_aboutme(blog)?;
+
         let paths = blog
             .posts()
             .par_iter()
@@ -151,6 +153,31 @@ impl<'a> Generator<'a> {
         let path = blog.prefix().join("index.html");
         self.render_template(&path, "index", data)?;
         Ok(path)
+    }
+
+    fn render_aboutme(&self, blog: &Blog) -> eyre::Result<()> {
+        if blog.aboutme().is_none() {
+            println!("There is no [About Me] post. Skip rendering [About Me] page.");
+            return Ok(());
+        }
+
+        let aboutme = blog.aboutme().as_ref().unwrap();
+
+        // then, we render the page in that path
+        let mut filename = PathBuf::from(&aboutme.filename);
+        filename.set_extension("html");
+
+        let data = json!({
+            "title": format!("{} | {}", aboutme.title, blog.title()),
+            "parent": "layout",
+            "blog": blog,
+            "aboutme": aboutme,
+            "root": blog.path_back_to_root(),
+        });
+
+        let path = blog.prefix().join(filename);
+        self.render_template(&path, &aboutme.layout, data)?;
+        Ok(())
     }
 
     fn render_post(&self, blog: &Blog, post: &Post) -> eyre::Result<PathBuf> {
