@@ -20,11 +20,14 @@ pub(crate) struct Manifest {
     /// Who maintains this blog? Appears in the rss feed.
     pub(crate) maintained_by: String,
 
+    pub(crate) github: String,
+
     /// Raw html describing the blog to insert into the index page.
     pub(crate) index_html: String,
 
     /// What text to use when linking to this blog in the "see also"
     /// section from other blogs.
+    #[serde(default)]
     pub(crate) link_text: String,
 
     pub(crate) domain: String,
@@ -38,6 +41,7 @@ pub(crate) struct Blog {
     description: String,
     domain: String,
     maintained_by: String,
+    github: String,
     index_html: String,
     #[serde(serialize_with = "add_postfix_slash")]
     prefix: PathBuf,
@@ -94,6 +98,7 @@ impl Blog {
             description: manifest.description,
             domain: manifest.domain,
             maintained_by: manifest.maintained_by,
+            github: manifest.github,
             index_html: manifest.index_html,
             link_text: manifest.link_text,
             prefix,
