@@ -4,6 +4,9 @@ and open-sourced as [rust-blog-template](https://github.com/ShuochengWang/rust-b
 
 Using this blog template you can create a static blog website with [blog.rust-lang.org](https://blog.rust-lang.org/) style. Not cool enough? but very Rust! Right?
 
+You can see a demo at [rust-blog-template](https://shuochengwang.github.io/rust-blog-template/)
+or [my blog](https://shuochengwang.github.io/).
+
 ## Import rust-blog-template
 
 Click `Use this template` button and click `Create a new repository`.
