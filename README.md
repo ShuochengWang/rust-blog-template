@@ -1,10 +1,22 @@
-### The rust-blog-template
+## The rust-blog-template
 This blog is developed from [blog.rust-lang.org](https://blog.rust-lang.org/)
 and open-sourced as [rust-blog-template](https://github.com/ShuochengWang/rust-blog-template).
 
 Using this blog template you can create a static blog website with [blog.rust-lang.org](https://blog.rust-lang.org/) style. Not cool enough? but very Rust! Right?
 
-### Building
+## Import rust-blog-template
+
+Click `Use this template` button and click `Create a new repository`.
+
+![use_template](./static/images/use_template.png)
+
+Then create a new repo with your GitHub Page name like `your_username.github.io`.
+
+![create_repo](./static/images/create_repo.png)
+
+Then the Github Action will help you to deploy your blog to Github Page automatically.
+
+## Building
 
 To build the site locally:
 
@@ -30,7 +42,7 @@ You can also run a server, if you need to preview your changes on a different ma
 Serving on: http://192.168.123.45:8000
 ```
 
-### Configure Blog
+## Configure Blog
 You can noticed that there is a `blog.yml` in the `./posts` directory, 
 just modify it according your case, and the content is like this:
 
@@ -65,7 +77,7 @@ domain: https://shuochengwang.github.io
 - **Configure the github action**:
   Modify the `./.github/workflows/main.yml` and modify the `./CNAME`.
 
-### Write Posts
+## Write Posts
 
 You can write your posts in `./posts` directory, and name your post as `year-month-day-title.md`, for example:
 `2023-12-16-Getting-started.md` or `2023-03-09-First-post.md`.
@@ -108,7 +120,7 @@ For each post, you should add a yaml header. The standard of the yaml header is 
 
 After configure the yaml header, you can write your post content directly with markdown syntax!
 
-##### Insert image in the post
+### Insert image in the post
 
 If you want to insert image in your post, you can add the image into `./static/images` directory and create a directory with the same name of your post file, and put your image there.
 
@@ -122,7 +134,7 @@ Then I can use markdown syntax to insert this image into my post:
 
 ![An image](./static/images/2023-12-16-Getting-started/image.png)
 
-### Configure "About Me" Page
+## Configure "About Me" Page
 There is a "About Me" page in the navigation bar of this blog.
 And you can configure this page by modifying the `./posts/aboutme.md` (create one if not exist).
 The format of `aboutme.md` is like following:
