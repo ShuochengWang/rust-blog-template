@@ -236,10 +236,11 @@ impl<'a> Generator<'a> {
             }
         });
 
-        let tags = tag2post
+        let mut tags = tag2post
             .keys()
             .map(|&tag| (tag, format!("tags/{}.html", tag)))
             .collect::<Vec<_>>();
+        tags.sort_by(|a, b| a.1.cmp(&b.1));
 
         // render tags index
         let tags_data = tags
