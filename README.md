@@ -120,7 +120,7 @@ Then I can use markdown syntax to insert this image into my post:
 ![An image](../../../images/2023-12-16-Getting-started/image.png)
 ```
 
-![An image](../../../images/2023-12-16-Getting-started/image.png)
+![An image](./static/images/2023-12-16-Getting-started/image.png)
 
 ### Configure "About Me" Page
 There is a "About Me" page in the navigation bar of this blog.
